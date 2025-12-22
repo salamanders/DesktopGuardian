@@ -1,0 +1,54 @@
+CREATE TABLE InstalledApp (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  installDate INTEGER,
+  version TEXT
+);
+
+selectAllApps:
+SELECT *
+FROM InstalledApp;
+
+insertApp:
+INSERT INTO InstalledApp(name, installDate, version)
+VALUES (?, ?, ?);
+
+deleteApp:
+DELETE FROM InstalledApp
+WHERE id = ?;
+
+CREATE TABLE BrowserExtension (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  browser TEXT NOT NULL,
+  extensionId TEXT NOT NULL,
+  name TEXT NOT NULL
+);
+
+selectAllExtensions:
+SELECT *
+FROM BrowserExtension;
+
+insertExtension:
+INSERT INTO BrowserExtension(browser, extensionId, name)
+VALUES (?, ?, ?);
+
+deleteExtension:
+DELETE FROM BrowserExtension
+WHERE id = ?;
+
+CREATE TABLE SearchConfig (
+  browser TEXT NOT NULL PRIMARY KEY,
+  providerUrl TEXT NOT NULL
+);
+
+selectAllSearchConfigs:
+SELECT *
+FROM SearchConfig;
+
+insertSearchConfig:
+INSERT OR REPLACE INTO SearchConfig(browser, providerUrl)
+VALUES (?, ?);
+
+deleteSearchConfig:
+DELETE FROM SearchConfig
+WHERE browser = ?;

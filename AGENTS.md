@@ -52,22 +52,22 @@ All agents (human or AI) working on this project must follow these instructions 
 
 ## Phase 3: Core Domain Logic (Platform Agnostic)
 
-- [ ] **3.1. Define Domain Models**
-    - [ ] Create data classes: `AppInfo`, `ExtensionInfo`, `SearchProviderInfo`.
-    - [ ] Create `Alert` data class (`type`, `severity`, `details`, `timestamp`).
+- [x] **3.1. Define Domain Models**
+    - [x] Create data classes: `AppInfo`, `ExtensionInfo`, `SearchProviderInfo`.
+    - [x] Create `Alert` data class (`type`, `severity`, `details`, `timestamp`).
 
-- [ ] **3.2. Define SystemMonitor Interface**
-    - [ ] Create `interface SystemMonitor`.
-    - [ ] Methods:
+- [x] **3.2. Define SystemMonitor Interface**
+    - [x] Create `interface SystemMonitor`.
+    - [x] Methods:
         - `suspend fun getInstalledApps(): List<AppInfo>`
         - `suspend fun getBrowserExtensions(browser: BrowserType): List<ExtensionInfo>`
         - `suspend fun getDefaultSearch(browser: BrowserType): SearchProviderInfo`
 
-- [ ] **3.3. Implement Diffing Engine**
-    - [ ] Create `DiffEngine` class.
-    - [ ] Logic: Compare "Current Snapshot" vs "Database Snapshot".
-    - [ ] Output: List of `Alert` objects (e.g., "New App: Spotify", "Extension Added: CouponBuddy").
-    - [ ] *Verification:* Write unit tests with mock data (Old State vs New State) to verify correct alerts are generated.
+- [x] **3.3. Implement Diffing Engine**
+    - [x] Create `DiffEngine` class.
+    - [x] Logic: Compare "Current Snapshot" vs "Database Snapshot".
+    - [x] Output: List of `Alert` objects (e.g., "New App: Spotify", "Extension Added: CouponBuddy").
+    - [x] *Verification:* Write unit tests with mock data (Old State vs New State) to verify correct alerts are generated.
 
 ---
 

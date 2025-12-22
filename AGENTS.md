@@ -33,20 +33,20 @@ All agents (human or AI) working on this project must follow these instructions 
 
 ## Phase 2: Data Persistence (SQLDelight)
 
-- [ ] **2.1. Define Database Schema**
-    - [ ] Create `composeApp/src/jvmMain/sqldelight/info/benjaminhill/desktopguardian/db/Main.sq`.
-    - [ ] Define tables:
+- [x] **2.1. Define Database Schema**
+    - [x] Create `composeApp/src/jvmMain/sqldelight/info/benjaminhill/desktopguardian/db/Main.sq`. (Note: Moved to `commonMain` for KMP compatibility)
+    - [x] Define tables:
         - `InstalledApp` (`id`, `name`, `installDate`, `version`)
         - `BrowserExtension` (`id`, `browser`, `extensionId`, `name`)
         - `SearchConfig` (`browser`, `providerUrl`)
-    - [ ] Define queries: `selectAllApps`, `insertApp`, `deleteApp`, etc.
-    - [ ] *Verification:* Run `./gradlew generateSqlDelightInterface` and check generated code in `build/generated`.
+    - [x] Define queries: `selectAllApps`, `insertApp`, `deleteApp`, etc.
+    - [x] *Verification:* Run `./gradlew generateSqlDelightInterface` and check generated code in `build/generated`.
 
-- [ ] **2.2. Implement Database Driver**
-    - [ ] Create `DatabaseDriverFactory.kt`.
-    - [ ] Initialize `JdbcSqliteDriver` with a file path (e.g., `desktop_guardian.db` in user home).
-    - [ ] Handle schema creation on first run.
-    - [ ] *Verification:* Write a JUnit test to create the DB and insert/select a record.
+- [x] **2.2. Implement Database Driver**
+    - [x] Create `DatabaseDriverFactory.kt`.
+    - [x] Initialize `JdbcSqliteDriver` with a file path (e.g., `desktop_guardian.db` in user home).
+    - [x] Handle schema creation on first run.
+    - [x] *Verification:* Write a JUnit test to create the DB and insert/select a record.
 
 ---
 

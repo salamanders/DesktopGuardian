@@ -15,19 +15,19 @@ All agents (human or AI) working on this project must follow these instructions 
 
 ## Phase 1: Project Setup & Dependencies
 
-- [ ] **1.1. Add Core Dependencies**
-    - [ ] Update `gradle/libs.versions.toml` and `composeApp/build.gradle.kts`.
-    - [ ] Add **SQLDelight** (SQLite driver for JVM).
-    - [ ] Add **Ktor Client** (CIO engine + ContentNegotiation + Serialization).
-    - [ ] Add **Kotlinx Serialization** (JSON).
-    - [ ] Add **JNA (Java Native Access)** (including `jna-platform` for Windows Registry access).
-    - [ ] Add **Logback/SLF4J** for logging.
-    - [ ] *Verification:* Run `./gradlew build` to ensure dependencies resolve.
+- [x] **1.1. Add Core Dependencies**
+    - [x] Update `gradle/libs.versions.toml` and `composeApp/build.gradle.kts`.
+    - [x] Add **SQLDelight** (SQLite driver for JVM).
+    - [x] Add **Ktor Client** (CIO engine + ContentNegotiation + Serialization).
+    - [x] Add **Kotlinx Serialization** (JSON).
+    - [x] Add **JNA (Java Native Access)** (including `jna-platform` for Windows Registry access).
+    - [x] Add **Logback/SLF4J** for logging.
+    - [x] *Verification:* Run `./gradlew build` to ensure dependencies resolve.
 
-- [ ] **1.2. Configure SQLDelight Plugin**
-    - [ ] Apply the SQLDelight plugin in `composeApp/build.gradle.kts`.
-    - [ ] Configure the database `desktopguardian` and package `info.benjaminhill.desktopguardian.db`.
-    - [ ] *Verification:* Run `./gradlew generateSqlDelightInterface`.
+- [x] **1.2. Configure SQLDelight Plugin**
+    - [x] Apply the SQLDelight plugin in `composeApp/build.gradle.kts`.
+    - [x] Configure the database `desktopguardian` and package `info.benjaminhill.desktopguardian.db`.
+    - [x] *Verification:* Run `./gradlew generateSqlDelightInterface`.
 
 ---
 

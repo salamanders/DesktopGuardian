@@ -110,22 +110,30 @@ All agents (human or AI) working on this project must follow these instructions 
    4. [x] *Verification:* Unit test with a sample `Preferences` JSON file.
 
 2. [ ] **6.2. Firefox LZ4 Decompression**
-   1. [ ] **CANCELLED/DEFERRED** per user instruction (complexity/priority trade-off).
+   1. [x] **CANCELLED** per user instruction.
 
 ---
 
-## Phase 7: Alerting System
+## Phase 7: Alerting System (Google Sheets Webhook)
 
-1. [x] **7.1. Implement Email Service**
-   1. [x] Create `EmailAlertService`.
-   2. [x] Use Ktor Client to POST to a generic endpoint (e.g., `https://api.grandpa-guardian.com/alert`).
-   3. [x] Payload: JSON with machine info and alert details.
-   4. [x] *Verification:* Use a tool like RequestBin or a mock server to verify the POST request format.
+1. [x] **7.1. Implement WebHook Service**
+   1. [x] Create `WebHookAlertService` (refactored from EmailAlertService).
+   2. [x] Use Ktor Client to POST to a Google Apps Script Web App URL.
+   3. [x] Payload: JSON with alert details.
+   4. [ ] *Verification:* Verify JSON format matches Google Apps Script expectations.
 
 2. [x] **7.2. Configuration for Alerting**
    1. [x] Move the hardcoded API endpoint to DB configuration (`AppConfig` table).
-   2. [x] Add a UI field to set the alert endpoint.
-   3. [x] *Verification:* Send an alert to a custom URL configured at runtime.
+   2. [ ] Add a UI field to set the "Google Apps Script URL".
+   3. [ ] Provide `docs/google_apps_script.js` for the user.
+
+## Phase 10: Linux Implementation (Extensions Only)
+
+1. [ ] **10.1. Linux Chrome Extensions**
+   1. [ ] Modify `LinuxSystemMonitor`.
+   2. [ ] Scan `~/.config/google-chrome/Default/Preferences`.
+   3. [ ] Use `ChromePreferencesParser`.
+   4. [ ] *Verification:* Unit test or manual verify on Linux (or verify code logic).
 
 ---
 

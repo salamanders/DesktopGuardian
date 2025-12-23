@@ -19,12 +19,27 @@ class GuardianManager {
     private val _lastScan = MutableStateFlow<String>("Never")
     val lastScan: StateFlow<String> = _lastScan.asStateFlow()
 
+    private val _alertEndpoint = MutableStateFlow("https://example.com/api/alert")
+    val alertEndpoint: StateFlow<String> = _alertEndpoint.asStateFlow()
+
     private val monitor = SystemMonitorFactory.getSystemMonitor()
     private val emailService = EmailAlertService()
 
     // We need to initialize the DB.
     private val driver = DatabaseDriverFactory().createDriver()
     private val database = desktopguardian(driver)
+
+    init {
+        val savedEndpoint = database.mainQueries.selectConfig("alert_endpoint").executeAsOneOrNull()
+        if (savedEndpoint != null) {
+            _alertEndpoint.value = savedEndpoint
+        }
+    }
+
+    fun updateAlertEndpoint(url: String) {
+        _alertEndpoint.value = url
+        database.mainQueries.insertConfig("alert_endpoint", url)
+    }
 
     // DiffEngine logic is pure, doesn't need DB access in constructor
     private val diffEngine = DiffEngine { System.currentTimeMillis() }
@@ -51,7 +66,7 @@ class GuardianManager {
             if (alerts.isNotEmpty()) {
                 _status.value = "Changes Detected! Sending ${alerts.size} alerts..."
                 alerts.forEach { alert ->
-                    emailService.sendAlert(alert)
+                    emailService.sendAlert(alert, _alertEndpoint.value)
                 }
             } else {
                 _status.value = "System Healthy. No changes."

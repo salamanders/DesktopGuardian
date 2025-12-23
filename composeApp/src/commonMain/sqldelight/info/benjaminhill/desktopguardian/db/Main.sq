@@ -58,3 +58,17 @@ VALUES (?, ?);
 deleteSearchConfig:
 DELETE FROM SearchConfig
 WHERE browser = ?;
+
+CREATE TABLE AppConfig (
+  key TEXT NOT NULL PRIMARY KEY,
+  value TEXT NOT NULL
+);
+
+selectConfig:
+SELECT value
+FROM AppConfig
+WHERE key = ?;
+
+insertConfig:
+INSERT OR REPLACE INTO AppConfig(key, value)
+VALUES (?, ?);

@@ -18,9 +18,7 @@ class EmailAlertService {
         }
     }
 
-    private val endpoint = "https://example.com/api/alert" // Placeholder
-
-    suspend fun sendAlert(alert: Alert) {
+    suspend fun sendAlert(alert: Alert, endpoint: String) {
         try {
             client.post(endpoint) {
                 contentType(ContentType.Application.Json)

@@ -38,6 +38,16 @@ fun App() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            val alertEndpoint by manager.alertEndpoint.collectAsState()
+            OutlinedTextField(
+                value = alertEndpoint,
+                onValueChange = { manager.updateAlertEndpoint(it) },
+                label = { Text("Alert API Endpoint") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             Button(onClick = {
                 scope.launch {
                     manager.runScan()

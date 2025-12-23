@@ -9,7 +9,7 @@ class DatabaseTest {
     @Test
     fun testDatabase() {
         val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
-        info.benjaminhill.desktopguardian.Schema.create(driver)
+        desktopguardian.Schema.create(driver)
         val database = desktopguardian(driver)
 
         database.mainQueries.insertApp("App1", 123L, "1.0")

@@ -56,8 +56,27 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "info.benjaminhill.desktopguardian"
+            packageName = "desktop-guardian"
             packageVersion = "1.0.0"
+            description = "A simple system monitor for installed apps and extensions."
+            copyright = "© 2024 Benjamin Hill"
+            vendor = "Benjamin Hill"
+
+            linux {
+                menuGroup = "Utility"
+                shortcut = true
+            }
+
+            macOS {
+                bundleID = "info.benjaminhill.desktopguardian"
+                dockName = "Desktop Guardian"
+            }
+
+            windows {
+                menuGroup = "Desktop Guardian"
+                shortcut = true
+                upgradeUuid = "12345678-1234-1234-1234-123456789012" // Fixed UUID for upgrades
+            }
         }
     }
 }

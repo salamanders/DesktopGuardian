@@ -17,6 +17,9 @@ deleteApp:
 DELETE FROM InstalledApp
 WHERE id = ?;
 
+deleteAllApps:
+DELETE FROM InstalledApp;
+
 CREATE TABLE BrowserExtension (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   browser TEXT NOT NULL,
@@ -35,6 +38,9 @@ VALUES (?, ?, ?);
 deleteExtension:
 DELETE FROM BrowserExtension
 WHERE id = ?;
+
+deleteAllExtensions:
+DELETE FROM BrowserExtension;
 
 CREATE TABLE SearchConfig (
   browser TEXT NOT NULL PRIMARY KEY,

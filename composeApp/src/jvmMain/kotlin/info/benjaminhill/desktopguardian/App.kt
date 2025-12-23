@@ -42,7 +42,7 @@ fun App() {
             OutlinedTextField(
                 value = alertEndpoint,
                 onValueChange = { manager.updateAlertEndpoint(it) },
-                label = { Text("Alert API Endpoint") },
+                label = { Text("Google Apps Script URL") },
                 modifier = Modifier.fillMaxWidth()
             )
 

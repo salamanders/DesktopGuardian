@@ -1,7 +1,7 @@
 package info.benjaminhill.desktopguardian
 
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
-import info.benjaminhill.desktopguardian.alert.EmailAlertService
+import info.benjaminhill.desktopguardian.alert.WebHookAlertService
 import info.benjaminhill.desktopguardian.db.DatabaseDriverFactory
 import info.benjaminhill.desktopguardian.platform.SystemMonitorFactory
 // The generated interface name is `desktopguardian` (lowercase)
@@ -23,7 +23,7 @@ class GuardianManager {
     val alertEndpoint: StateFlow<String> = _alertEndpoint.asStateFlow()
 
     private val monitor = SystemMonitorFactory.getSystemMonitor()
-    private val emailService = EmailAlertService()
+    private val webhookService = WebHookAlertService()
 
     // We need to initialize the DB.
     private val driver = DatabaseDriverFactory().createDriver()
@@ -66,7 +66,7 @@ class GuardianManager {
             if (alerts.isNotEmpty()) {
                 _status.value = "Changes Detected! Sending ${alerts.size} alerts..."
                 alerts.forEach { alert ->
-                    emailService.sendAlert(alert, _alertEndpoint.value)
+                    webhookService.sendAlert(alert, _alertEndpoint.value)
                 }
             } else {
                 _status.value = "System Healthy. No changes."

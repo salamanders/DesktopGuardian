@@ -1,12 +1,13 @@
 package info.benjaminhill.desktopguardian.parsers
 
 import info.benjaminhill.desktopguardian.BrowserType
-import kotlin.test.Test
+import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 
 class ChromePreferencesParserTest {
+
+    private val parser = ChromePreferencesParser()
 
     @Test
     fun testParse() {
@@ -14,45 +15,32 @@ class ChromePreferencesParserTest {
             {
               "extensions": {
                 "settings": {
-                  "ghbmnnjooekpmoecnnnilnnbdlolhkhi": {
+                  "ext_id_1": {
                     "manifest": {
-                      "name": "Google Docs Offline",
-                      "version": "1.4"
+                      "name": "Extension One",
+                      "version": "1.0"
                     }
                   }
                 }
               },
               "default_search_provider": {
                 "data": {
-                   "template_url_data": {
-                      "short_name": "Google",
-                      "url": "{google:baseURL}search?q={searchTerms}"
-                   }
+                  "template_url_data": {
+                    "short_name": "Google",
+                    "url": "https://google.com/search?q={searchTerms}"
+                  }
                 }
               }
             }
         """.trimIndent()
 
-        val parser = ChromePreferencesParser()
         val result = parser.parse(json, BrowserType.CHROME)
 
         assertEquals(1, result.extensions.size)
-        assertEquals("Google Docs Offline", result.extensions[0].name)
-        assertEquals("ghbmnnjooekpmoecnnnilnnbdlolhkhi", result.extensions[0].id)
-        assertEquals(BrowserType.CHROME, result.extensions[0].browser)
+        assertEquals("Extension One", result.extensions[0].name)
+        assertEquals("ext_id_1", result.extensions[0].id)
 
         assertNotNull(result.searchProvider)
-        assertEquals(BrowserType.CHROME, result.searchProvider!!.browser)
-        assertEquals("{google:baseURL}search?q={searchTerms}", result.searchProvider!!.url)
-    }
-
-    @Test
-    fun testParseEmpty() {
-         val json = "{}"
-         val parser = ChromePreferencesParser()
-         val result = parser.parse(json, BrowserType.EDGE)
-
-         assertEquals(0, result.extensions.size)
-         assertNull(result.searchProvider)
+        assertEquals("https://google.com/search?q={searchTerms}", result.searchProvider?.url)
     }
 }

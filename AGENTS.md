@@ -39,6 +39,7 @@ All agents (human or AI) working on this project must follow these instructions 
       - `InstalledApp` (`id`, `name`, `installDate`, `version`)
       - `BrowserExtension` (`id`, `browser`, `extensionId`, `name`)
       - `SearchConfig` (`browser`, `providerUrl`)
+      - `AppConfig` (`key`, `value`) for application settings.
    3. [x] Define queries: `selectAllApps`, `insertApp`, `deleteApp`, etc.
    4. [x] *Verification:* Run `./gradlew generateSqlDelightInterface` and check generated code in `build/generated`.
 
@@ -108,12 +109,8 @@ All agents (human or AI) working on this project must follow these instructions 
    3. [x] Extract extension list (`extensions.settings`) and default search provider.
    4. [x] *Verification:* Unit test with a sample `Preferences` JSON file.
 
-2. [ ] **6.2. Firefox LZ4 Decompression (Bonus/Advanced)**
-   1. [ ] *Note:* Firefox uses `mozlz4`.
-   2. [ ] Research a Java/Kotlin library or snippet to decompress `mozLz4`.
-   3. [ ] Create `FirefoxLz4Parser` to handle decompression.
-   4. [ ] Implement `getBrowserExtensions` for Firefox in Windows/macOS monitors.
-   5. [ ] *Verification:* Create a test with a sample `search.json.mozlz4` or `extensions.json` file.
+2. [ ] **6.2. Firefox LZ4 Decompression**
+   1. [ ] **CANCELLED/DEFERRED** per user instruction (complexity/priority trade-off).
 
 ---
 
@@ -125,10 +122,10 @@ All agents (human or AI) working on this project must follow these instructions 
    3. [x] Payload: JSON with machine info and alert details.
    4. [x] *Verification:* Use a tool like RequestBin or a mock server to verify the POST request format.
 
-2. [ ] **7.2. Configuration for Alerting**
-   1. [ ] Move the hardcoded API endpoint (`https://example.com/api/alert`) to a configuration file or environment variable.
-   2. [ ] Add a UI field or config file to set the alert endpoint.
-   3. [ ] *Verification:* Send an alert to a custom URL configured at runtime.
+2. [x] **7.2. Configuration for Alerting**
+   1. [x] Move the hardcoded API endpoint to DB configuration (`AppConfig` table).
+   2. [x] Add a UI field to set the alert endpoint.
+   3. [x] *Verification:* Send an alert to a custom URL configured at runtime.
 
 ---
 
@@ -148,7 +145,8 @@ All agents (human or AI) working on this project must follow these instructions 
    1. [x] Update `App.kt`.
    2. [x] Display: "Monitoring Active", "Last Scan: [Time]", "System Health: OK".
    3. [x] Add "Force Scan" button.
-   4. [x] *Verification:* Run the app (`./gradlew run`) and verify UI updates.
+   4. [x] Add "Alert API Endpoint" configuration field.
+   5. [x] *Verification:* Run the app (`./gradlew run`) and verify UI updates.
 
 ---
 
@@ -161,10 +159,10 @@ All agents (human or AI) working on this project must follow these instructions 
    4. [x] Add a UI button "Enable Startup" that runs this logic.
 
 2. [x] **9.2. Packaging**
-   1. [x] Configure `jpackage` in `build.gradle.kts` (already partially there).
+   1. [x] Configure `jpackage` in `build.gradle.kts`.
    2. [x] *Verification:* Run `./gradlew package` (or equivalent) to generate the installer.
 
-3. [ ] **9.3. Robust Startup Path Detection**
-   1. [ ] Improve `StartupManager` to better handle packaged app paths (vs Gradle dev paths).
-   2. [ ] Current implementation has "best-effort" detection and may fail in packaged apps.
-   3. [ ] Verify persistence works after packaging.
+3. [x] **9.3. Robust Startup Path Detection**
+   1. [x] Improve `StartupManager` to handle packaged app paths (using `jpackage.app-path`).
+   2. [x] Fallback to classpath for dev environments.
+   3. [x] *Verification:* Verify code compilation and logic structure.

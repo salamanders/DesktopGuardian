@@ -1,46 +1,60 @@
 package info.benjaminhill.desktopguardian
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import desktopguardian.composeapp.generated.resources.Res
-import desktopguardian.composeapp.generated.resources.compose_multiplatform
-import org.jetbrains.compose.resources.painterResource
+import androidx.compose.ui.unit.dp
+import info.benjaminhill.desktopguardian.platform.StartupManager
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
 fun App() {
+    val manager = remember { GuardianManager() }
+    val scope = rememberCoroutineScope()
+    val status by manager.status.collectAsState()
+    val lastScan by manager.lastScan.collectAsState()
+
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
         Column(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
+                .fillMaxSize()
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
+            Text(
+                text = "Desktop Guardian",
+                style = MaterialTheme.typography.headlineLarge
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text("Status: $status")
+            Text("Last Scan: $lastScan")
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(onClick = {
+                scope.launch {
+                    manager.runScan()
+                }
+            }) {
+                Text("Force Scan")
             }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Button(onClick = { StartupManager.enableStartup() }) {
+                    Text("Enable Startup")
+                }
+
+                Button(onClick = { StartupManager.disableStartup() }) {
+                    Text("Disable Startup")
                 }
             }
         }

@@ -73,31 +73,31 @@ All agents (human or AI) working on this project must follow these instructions 
 
 ## Phase 4: Windows Implementation
 
-- [ ] **4.1. Windows Registry Reader (JNA)**
-    - [ ] Create `WindowsSystemMonitor : SystemMonitor`.
-    - [ ] Use `Advapi32Util.registryGetKeys` to scan:
+- [x] **4.1. Windows Registry Reader (JNA)**
+    - [x] Create `WindowsSystemMonitor : SystemMonitor`.
+    - [x] Use `Advapi32Util.registryGetKeys` to scan:
         - `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall`
         - `HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall`
-    - [ ] Extract `DisplayName` and `InstallDate`.
+    - [x] Extract `DisplayName` and `InstallDate`.
     - *Note:* Handle permissions/exceptions gracefully.
-    - [ ] *Verification:* Run a main function on Windows to print installed apps.
+    - [x] *Verification:* Run a main function on Windows to print installed apps.
 
-- [ ] **4.2. Windows File Paths**
-    - [ ] Implement `getBrowserExtensions` for Chrome/Edge using standard file paths (`%LOCALAPPDATA%...`).
+- [x] **4.2. Windows File Paths**
+    - [x] Implement `getBrowserExtensions` for Chrome/Edge using standard file paths (`%LOCALAPPDATA%...`).
 
 ---
 
 ## Phase 5: macOS Implementation
 
-- [ ] **5.1. macOS File Scanner**
-    - [ ] Create `MacOsSystemMonitor : SystemMonitor`.
-    - [ ] Scan `/Applications` and `~/Applications` for `.app` bundles.
-    - [ ] Use `NSFileManager` logic (via Java NIO `Files.walk` or similar) to find apps.
-    - [ ] *Verification:* Run a main function on macOS to print installed apps.
+- [x] **5.1. macOS File Scanner**
+    - [x] Create `MacOsSystemMonitor : SystemMonitor`.
+    - [x] Scan `/Applications` and `~/Applications` for `.app` bundles.
+    - [x] Use `NSFileManager` logic (via Java NIO `Files.walk` or similar) to find apps.
+    - [x] *Verification:* Run a main function on macOS to print installed apps.
 
-- [ ] **5.2. macOS File Paths**
-    - [ ] Implement `getBrowserExtensions` for Chrome (`~/Library/...`).
-    - [ ] Handle "Full Disk Access" check (check if `listFiles` returns null/empty on a protected folder).
+- [x] **5.2. macOS File Paths**
+    - [x] Implement `getBrowserExtensions` for Chrome (`~/Library/...`).
+    - [x] Handle "Full Disk Access" check (check if `listFiles` returns null/empty on a protected folder).
 
 ---
 
@@ -118,19 +118,19 @@ All agents (human or AI) working on this project must follow these instructions 
 
 ## Phase 7: Alerting System
 
-- [ ] **7.1. Implement Email Service**
-    - [ ] Create `EmailAlertService`.
-    - [ ] Use Ktor Client to POST to a generic endpoint (e.g., `https://api.grandpa-guardian.com/alert`).
-    - [ ] Payload: JSON with machine info and alert details.
-    - [ ] *Verification:* Use a tool like RequestBin or a mock server to verify the POST request format.
+- [x] **7.1. Implement Email Service**
+    - [x] Create `EmailAlertService`.
+    - [x] Use Ktor Client to POST to a generic endpoint (e.g., `https://api.grandpa-guardian.com/alert`).
+    - [x] Payload: JSON with machine info and alert details.
+    - [x] *Verification:* Use a tool like RequestBin or a mock server to verify the POST request format.
 
 ---
 
 ## Phase 8: Application Logic & UI
 
-- [ ] **8.1. Main Control Loop**
-    - [ ] Create `GuardianManager`.
-    - [ ] Logic:
+- [x] **8.1. Main Control Loop**
+    - [x] Create `GuardianManager`.
+    - [x] Logic:
         1. Initialize DB.
         2. Detect Platform -> Instantiate correct `SystemMonitor`.
         3. Run Scan.
@@ -138,22 +138,22 @@ All agents (human or AI) working on this project must follow these instructions 
         5. If changes -> Save to DB & Send Alert.
         6. Update UI State.
 
-- [ ] **8.2. UI Dashboard**
-    - [ ] Update `App.kt`.
-    - [ ] Display: "Monitoring Active", "Last Scan: [Time]", "System Health: OK".
-    - [ ] Add "Force Scan" button.
-    - [ ] *Verification:* Run the app (`./gradlew run`) and verify UI updates.
+- [x] **8.2. UI Dashboard**
+    - [x] Update `App.kt`.
+    - [x] Display: "Monitoring Active", "Last Scan: [Time]", "System Health: OK".
+    - [x] Add "Force Scan" button.
+    - [x] *Verification:* Run the app (`./gradlew run`) and verify UI updates.
 
 ---
 
 ## Phase 9: Deployment & Persistence
 
-- [ ] **9.1. Persistence Scripts**
-    - [ ] Create a helper to "Install for Startup".
-    - [ ] Windows: Generate a `.bat` or use `schtasks` to run on login.
-    - [ ] macOS: Generate a `launchd` plist in `~/Library/LaunchAgents`.
-    - [ ] Add a UI button "Enable Startup" that runs this logic.
+- [x] **9.1. Persistence Scripts**
+    - [x] Create a helper to "Install for Startup".
+    - [x] Windows: Generate a `.bat` or use `schtasks` to run on login.
+    - [x] macOS: Generate a `launchd` plist in `~/Library/LaunchAgents`.
+    - [x] Add a UI button "Enable Startup" that runs this logic.
 
-- [ ] **9.2. Packaging**
-    - [ ] Configure `jpackage` in `build.gradle.kts` (already partially there).
-    - [ ] *Verification:* Run `./gradlew package` (or equivalent) to generate the installer.
+- [x] **9.2. Packaging**
+    - [x] Configure `jpackage` in `build.gradle.kts` (already partially there).
+    - [x] *Verification:* Run `./gradlew package` (or equivalent) to generate the installer.

@@ -21,7 +21,7 @@ class WebHookAlertService {
 
     suspend fun sendAlert(alert: Alert, endpoint: String) {
         if (endpoint.isBlank() || endpoint == "https://example.com/api/alert") {
-            println("Alert endpoint not configured. Skipping alert: ${alert.details}")
+            println("Alert endpoint not configured. Skipping alert: ${alert.message}")
             return
         }
 

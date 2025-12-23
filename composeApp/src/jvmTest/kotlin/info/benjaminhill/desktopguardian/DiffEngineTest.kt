@@ -25,8 +25,8 @@ class DiffEngineTest {
         val alerts = diffEngine.diffApps(currentApps, savedApps)
 
         assertEquals(2, alerts.size)
-        assertTrue(alerts.any { it.type == AlertType.APP_ADDED && it.details.contains("App2") })
-        assertTrue(alerts.any { it.type == AlertType.APP_REMOVED && it.details.contains("App3") })
+        assertTrue(alerts.any { it.type == AlertType.APP_ADDED && it.message.contains("App2") })
+        assertTrue(alerts.any { it.type == AlertType.APP_REMOVED && it.message.contains("App3") })
     }
 
     @Test
@@ -43,8 +43,8 @@ class DiffEngineTest {
         val alerts = diffEngine.diffExtensions(currentExts, savedExts)
 
         assertEquals(2, alerts.size)
-        assertTrue(alerts.any { it.type == AlertType.EXTENSION_ADDED && it.details.contains("Ext2") })
-        assertTrue(alerts.any { it.type == AlertType.EXTENSION_REMOVED && it.details.contains("Ext3") })
+        assertTrue(alerts.any { it.type == AlertType.EXTENSION_ADDED && it.message.contains("Ext2") })
+        assertTrue(alerts.any { it.type == AlertType.EXTENSION_REMOVED && it.message.contains("Ext3") })
     }
 
     @Test

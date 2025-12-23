@@ -103,11 +103,11 @@ All agents (human or AI) working on this project must follow these instructions 
 
 ## Phase 6: Browser Integration (Parsers)
 
-- [ ] **6.1. Chrome/Edge Preferences Parser**
-    - [ ] Create `ChromePreferencesParser`.
-    - [ ] Read `Preferences` JSON file.
-    - [ ] Extract extension list (`extensions.settings`) and default search provider.
-    - [ ] *Verification:* Unit test with a sample `Preferences` JSON file.
+- [x] **6.1. Chrome/Edge Preferences Parser**
+    - [x] Create `ChromePreferencesParser`.
+    - [x] Read `Preferences` JSON file.
+    - [x] Extract extension list (`extensions.settings`) and default search provider.
+    - [x] *Verification:* Unit test with a sample `Preferences` JSON file.
 
 - [ ] **6.2. Firefox LZ4 Decompression (Bonus/Advanced)**
     - [ ] *Note:* Firefox uses `mozlz4`.

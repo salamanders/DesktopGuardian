@@ -16,9 +16,9 @@ class DiffEngine(
         currentMap.forEach { (name, app) ->
             val savedApp = savedMap[name]
             if (savedApp == null) {
-                alerts.add(createAlert(AlertType.APP_ADDED, AlertSeverity.INFO, "New app installed: ${app.name} (${app.version ?: "unknown"})"))
+                alerts.add(createAlert(AlertType.APP_ADDED, AlertSeverity.INFO, "New app installed: ${app.name}", "Version: ${app.version ?: "unknown"}"))
             } else if (app.version != savedApp.version) {
-                alerts.add(createAlert(AlertType.APP_UPDATED, AlertSeverity.INFO, "App updated: ${app.name} from ${savedApp.version} to ${app.version}"))
+                alerts.add(createAlert(AlertType.APP_UPDATED, AlertSeverity.INFO, "App updated: ${app.name}", "Version: ${savedApp.version} -> ${app.version}"))
             }
         }
 
@@ -41,14 +41,14 @@ class DiffEngine(
         // Added
         currentMap.forEach { (key, ext) ->
             if (!savedMap.containsKey(key)) {
-                alerts.add(createAlert(AlertType.EXTENSION_ADDED, AlertSeverity.WARNING, "Extension added to ${ext.browser}: ${ext.name}"))
+                alerts.add(createAlert(AlertType.EXTENSION_ADDED, AlertSeverity.WARNING, "Extension added to ${ext.browser}: ${ext.name}", "ID: ${ext.id}"))
             }
         }
 
         // Removed
         savedMap.forEach { (key, savedExt) ->
             if (!currentMap.containsKey(key)) {
-                alerts.add(createAlert(AlertType.EXTENSION_REMOVED, AlertSeverity.INFO, "Extension removed from ${savedExt.browser}: ${savedExt.name}"))
+                alerts.add(createAlert(AlertType.EXTENSION_REMOVED, AlertSeverity.INFO, "Extension removed from ${savedExt.browser}: ${savedExt.name}", "ID: ${savedExt.extensionId}"))
             }
         }
 
@@ -63,13 +63,13 @@ class DiffEngine(
         currentMap.forEach { (browserName, info) ->
             val savedConfig = savedMap[browserName]
             if (savedConfig != null && savedConfig.providerUrl != info.url) {
-                 alerts.add(createAlert(AlertType.SEARCH_CHANGED, AlertSeverity.CRITICAL, "Search provider changed for $browserName: ${savedConfig.providerUrl} -> ${info.url}"))
+                 alerts.add(createAlert(AlertType.SEARCH_CHANGED, AlertSeverity.CRITICAL, "Search provider changed for $browserName", "${savedConfig.providerUrl} -> ${info.url}"))
             }
         }
         return alerts
     }
 
-    private fun createAlert(type: AlertType, severity: AlertSeverity, details: String): Alert {
-        return Alert(type, severity, details, timeProvider())
+    private fun createAlert(type: AlertType, severity: AlertSeverity, message: String, details: String = ""): Alert {
+        return Alert(type, severity, message, details, timeProvider())
     }
 }

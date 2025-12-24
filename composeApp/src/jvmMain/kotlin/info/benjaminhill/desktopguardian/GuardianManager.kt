@@ -1,14 +1,12 @@
 package info.benjaminhill.desktopguardian
 
-import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import info.benjaminhill.desktopguardian.alert.WebHookAlertService
 import info.benjaminhill.desktopguardian.db.DatabaseDriverFactory
-import info.benjaminhill.desktopguardian.platform.SystemMonitorFactory
 import info.benjaminhill.desktopguardian.db.desktopguardian
+import info.benjaminhill.desktopguardian.platform.SystemMonitorFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.util.Properties
 
 /**
  * Orchestrates the scanning, diffing, and alerting process.
@@ -56,10 +54,10 @@ class GuardianManager {
         try {
             // 1. Get Current State (Raw OS Data)
             val currentApps = monitor.getInstalledApps()
-            val currentExtensions = BrowserType.values().flatMap { browser ->
+            val currentExtensions = BrowserType.entries.flatMap { browser ->
                 monitor.getBrowserExtensions(browser)
             }
-            val currentSearch = BrowserType.values().mapNotNull { browser ->
+            val currentSearch = BrowserType.entries.mapNotNull { browser ->
                 monitor.getDefaultSearch(browser)
             }
 

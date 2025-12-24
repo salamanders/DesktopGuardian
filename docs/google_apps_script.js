@@ -9,42 +9,42 @@
 // 7. Copy the "Web App URL" and paste it into the Desktop Guardian app.
 
 function doPost(e) {
-  try {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    var jsonData = JSON.parse(e.postData.contents);
+    try {
+        var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+        var jsonData = JSON.parse(e.postData.contents);
 
-    // Check if headers exist, if not, create them
-    if (sheet.getLastRow() === 0) {
-      sheet.appendRow(["Timestamp", "Date", "Type", "Severity", "Message", "Details"]);
+        // Check if headers exist, if not, create them
+        if (sheet.getLastRow() === 0) {
+            sheet.appendRow(["Timestamp", "Date", "Type", "Severity", "Message", "Details"]);
+        }
+
+        // Extract data from the Alert object
+        // Expected JSON structure:
+        // {
+        //   "type": "APP_ADDED",
+        //   "severity": "INFO",
+        //   "message": "New App: Discord",
+        //   "details": "Version 1.0.0",
+        //   "timestamp": 1715623423423
+        // }
+
+        var timestamp = jsonData.timestamp || Date.now();
+        var dateString = new Date(timestamp).toLocaleString();
+
+        sheet.appendRow([
+            timestamp,
+            dateString,
+            jsonData.type || "UNKNOWN",
+            jsonData.severity || "INFO",
+            jsonData.message || "No message",
+            jsonData.details || ""
+        ]);
+
+        return ContentService.createTextOutput(JSON.stringify({"status": "success"}))
+            .setMimeType(ContentService.MimeType.JSON);
+
+    } catch (error) {
+        return ContentService.createTextOutput(JSON.stringify({"status": "error", "message": error.toString()}))
+            .setMimeType(ContentService.MimeType.JSON);
     }
-
-    // Extract data from the Alert object
-    // Expected JSON structure:
-    // {
-    //   "type": "APP_ADDED",
-    //   "severity": "INFO",
-    //   "message": "New App: Discord",
-    //   "details": "Version 1.0.0",
-    //   "timestamp": 1715623423423
-    // }
-
-    var timestamp = jsonData.timestamp || Date.now();
-    var dateString = new Date(timestamp).toLocaleString();
-
-    sheet.appendRow([
-      timestamp,
-      dateString,
-      jsonData.type || "UNKNOWN",
-      jsonData.severity || "INFO",
-      jsonData.message || "No message",
-      jsonData.details || ""
-    ]);
-
-    return ContentService.createTextOutput(JSON.stringify({"status": "success"}))
-      .setMimeType(ContentService.MimeType.JSON);
-
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({"status": "error", "message": error.toString()}))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
 }

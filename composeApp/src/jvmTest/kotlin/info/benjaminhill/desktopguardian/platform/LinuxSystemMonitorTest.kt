@@ -2,7 +2,6 @@ package info.benjaminhill.desktopguardian.platform
 
 import info.benjaminhill.desktopguardian.BrowserType
 import org.junit.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class LinuxSystemMonitorTest {
@@ -21,7 +20,10 @@ class LinuxSystemMonitorTest {
         // In CI environment, we expect this to handle missing files gracefully and return empty list
         val extensions = monitor.getBrowserExtensions(BrowserType.CHROME)
         // We can't guarantee extensions exist, but we can guarantee it doesn't crash
-        assertTrue(extensions.isEmpty() || extensions.isNotEmpty(), "Should return a list (empty or not) without throwing")
+        assertTrue(
+            extensions.isEmpty() || extensions.isNotEmpty(),
+            "Should return a list (empty or not) without throwing"
+        )
     }
 
     @Test

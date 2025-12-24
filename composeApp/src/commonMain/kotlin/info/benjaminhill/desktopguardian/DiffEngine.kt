@@ -1,7 +1,7 @@
 package info.benjaminhill.desktopguardian
 
-import info.benjaminhill.desktopguardian.db.InstalledApp
 import info.benjaminhill.desktopguardian.db.BrowserExtension
+import info.benjaminhill.desktopguardian.db.InstalledApp
 import info.benjaminhill.desktopguardian.db.SearchConfig
 
 /**
@@ -21,9 +21,23 @@ class DiffEngine(
         currentMap.forEach { (name, app) ->
             val savedApp = savedMap[name]
             if (savedApp == null) {
-                alerts.add(createAlert(AlertType.APP_ADDED, AlertSeverity.INFO, "New app installed: ${app.name}", "Version: ${app.version ?: "unknown"}"))
+                alerts.add(
+                    createAlert(
+                        AlertType.APP_ADDED,
+                        AlertSeverity.INFO,
+                        "New app installed: ${app.name}",
+                        "Version: ${app.version ?: "unknown"}"
+                    )
+                )
             } else if (app.version != savedApp.version) {
-                alerts.add(createAlert(AlertType.APP_UPDATED, AlertSeverity.INFO, "App updated: ${app.name}", "Version: ${savedApp.version} -> ${app.version}"))
+                alerts.add(
+                    createAlert(
+                        AlertType.APP_UPDATED,
+                        AlertSeverity.INFO,
+                        "App updated: ${app.name}",
+                        "Version: ${savedApp.version} -> ${app.version}"
+                    )
+                )
             }
         }
 
@@ -46,14 +60,28 @@ class DiffEngine(
         // Added
         currentMap.forEach { (key, ext) ->
             if (!savedMap.containsKey(key)) {
-                alerts.add(createAlert(AlertType.EXTENSION_ADDED, AlertSeverity.WARNING, "Extension added to ${ext.browser}: ${ext.name}", "ID: ${ext.id}"))
+                alerts.add(
+                    createAlert(
+                        AlertType.EXTENSION_ADDED,
+                        AlertSeverity.WARNING,
+                        "Extension added to ${ext.browser}: ${ext.name}",
+                        "ID: ${ext.id}"
+                    )
+                )
             }
         }
 
         // Removed
         savedMap.forEach { (key, savedExt) ->
             if (!currentMap.containsKey(key)) {
-                alerts.add(createAlert(AlertType.EXTENSION_REMOVED, AlertSeverity.INFO, "Extension removed from ${savedExt.browser}: ${savedExt.name}", "ID: ${savedExt.extensionId}"))
+                alerts.add(
+                    createAlert(
+                        AlertType.EXTENSION_REMOVED,
+                        AlertSeverity.INFO,
+                        "Extension removed from ${savedExt.browser}: ${savedExt.name}",
+                        "ID: ${savedExt.extensionId}"
+                    )
+                )
             }
         }
 
@@ -68,7 +96,14 @@ class DiffEngine(
         currentMap.forEach { (browserName, info) ->
             val savedConfig = savedMap[browserName]
             if (savedConfig != null && savedConfig.providerUrl != info.url) {
-                 alerts.add(createAlert(AlertType.SEARCH_CHANGED, AlertSeverity.CRITICAL, "Search provider changed for $browserName", "${savedConfig.providerUrl} -> ${info.url}"))
+                alerts.add(
+                    createAlert(
+                        AlertType.SEARCH_CHANGED,
+                        AlertSeverity.CRITICAL,
+                        "Search provider changed for $browserName",
+                        "${savedConfig.providerUrl} -> ${info.url}"
+                    )
+                )
             }
         }
         return alerts

@@ -35,11 +35,10 @@ object StartupManager {
         }
 
         val appPath = System.getProperty("java.class.path")
-        val javaHome = System.getProperty("java.home")
 
         // Basic dev/gradle detection
         if (appPath.contains("gradle")) {
-             return emptyList()
+            return emptyList()
         }
 
         // Fallback for non-jpackage execution (e.g. java -jar)
@@ -75,24 +74,26 @@ object StartupManager {
         // If the path has spaces, it needs inner quotes.
 
         val taskRunCommand = if (commandParts.size == 1) {
-             // jpackage: "C:\Path\To\Exe" --scan-only
-             "\"${commandParts[0]}\" --scan-only"
+            // jpackage: "C:\Path\To\Exe" --scan-only
+            "\"${commandParts[0]}\" --scan-only"
         } else {
-             // java -jar: java -jar "C:\Path\To\Jar" --scan-only
-             // Note: using javaw for java -jar might hide console, but --scan-only is headless anyway.
-             // We use commandParts[0] (java/javaw), commandParts[1] (-jar), commandParts[2] (path)
-             "${commandParts[0]} ${commandParts[1]} \"${commandParts[2]}\" --scan-only"
+            // java -jar: java -jar "C:\Path\To\Jar" --scan-only
+            // Note: using javaw for java -jar might hide console, but --scan-only is headless anyway.
+            // We use commandParts[0] (java/javaw), commandParts[1] (-jar), commandParts[2] (path)
+            "${commandParts[0]} ${commandParts[1]} \"${commandParts[2]}\" --scan-only"
         }
 
         try {
-            val process = Runtime.getRuntime().exec(arrayOf(
-                "schtasks", "/Create",
-                "/SC", "DAILY",
-                "/TN", "DesktopGuardianScan",
-                "/TR", taskRunCommand,
-                "/ST", "10:00",
-                "/F" // Force overwrite
-            ))
+            val process = Runtime.getRuntime().exec(
+                arrayOf(
+                    "schtasks", "/Create",
+                    "/SC", "DAILY",
+                    "/TN", "DesktopGuardianScan",
+                    "/TR", taskRunCommand,
+                    "/ST", "10:00",
+                    "/F" // Force overwrite
+                )
+            )
 
             val exitCode = process.waitFor()
             if (exitCode == 0) {
@@ -109,11 +110,13 @@ object StartupManager {
 
     private fun disableWindowsStartup() {
         try {
-             val process = Runtime.getRuntime().exec(arrayOf(
-                "schtasks", "/Delete",
-                "/TN", "DesktopGuardianScan",
-                "/F"
-            ))
+            val process = Runtime.getRuntime().exec(
+                arrayOf(
+                    "schtasks", "/Delete",
+                    "/TN", "DesktopGuardianScan",
+                    "/F"
+                )
+            )
             process.waitFor()
         } catch (e: Exception) {
             e.printStackTrace()

@@ -1,10 +1,6 @@
 package info.benjaminhill.desktopguardian.platform
 
-import info.benjaminhill.desktopguardian.AppInfo
-import info.benjaminhill.desktopguardian.BrowserType
-import info.benjaminhill.desktopguardian.ExtensionInfo
-import info.benjaminhill.desktopguardian.SearchProviderInfo
-import info.benjaminhill.desktopguardian.SystemMonitor
+import info.benjaminhill.desktopguardian.*
 import info.benjaminhill.desktopguardian.parsers.ChromePreferencesParser
 import java.io.File
 

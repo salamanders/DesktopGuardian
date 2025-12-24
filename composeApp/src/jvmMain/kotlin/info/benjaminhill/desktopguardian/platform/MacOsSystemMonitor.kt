@@ -1,16 +1,12 @@
 package info.benjaminhill.desktopguardian.platform
 
-import info.benjaminhill.desktopguardian.AppInfo
-import info.benjaminhill.desktopguardian.BrowserType
-import info.benjaminhill.desktopguardian.ExtensionInfo
-import info.benjaminhill.desktopguardian.SearchProviderInfo
-import info.benjaminhill.desktopguardian.SystemMonitor
+import info.benjaminhill.desktopguardian.*
 import info.benjaminhill.desktopguardian.parsers.ChromePreferencesParser
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.streams.toList
 
 /**
  * macOS implementation of SystemMonitor.
@@ -31,7 +27,9 @@ class MacOsSystemMonitor : SystemMonitor {
         for (path in searchPaths) {
             if (Files.exists(path)) {
                 try {
-                    Files.walk(path, 2).use { stream ->
+                    withContext(Dispatchers.IO) {
+                        Files.walk(path, 2)
+                    }.use { stream ->
                         stream.filter { it.toString().endsWith(".app") }
                             .forEach { appPath ->
                                 val name = appPath.fileName.toString().removeSuffix(".app")
@@ -50,7 +48,7 @@ class MacOsSystemMonitor : SystemMonitor {
         val file = getPreferencesFile(browser) ?: return emptyList()
         return try {
             chromeParser.parse(file.readText(), browser).extensions
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptyList()
         }
     }
@@ -59,7 +57,7 @@ class MacOsSystemMonitor : SystemMonitor {
         val file = getPreferencesFile(browser) ?: return null
         return try {
             chromeParser.parse(file.readText(), browser).searchProvider
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }

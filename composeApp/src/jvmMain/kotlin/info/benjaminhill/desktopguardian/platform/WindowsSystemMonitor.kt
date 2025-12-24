@@ -2,11 +2,7 @@ package info.benjaminhill.desktopguardian.platform
 
 import com.sun.jna.platform.win32.Advapi32Util
 import com.sun.jna.platform.win32.WinReg
-import info.benjaminhill.desktopguardian.AppInfo
-import info.benjaminhill.desktopguardian.BrowserType
-import info.benjaminhill.desktopguardian.ExtensionInfo
-import info.benjaminhill.desktopguardian.SearchProviderInfo
-import info.benjaminhill.desktopguardian.SystemMonitor
+import info.benjaminhill.desktopguardian.*
 import info.benjaminhill.desktopguardian.parsers.ChromePreferencesParser
 import java.io.File
 
@@ -38,17 +34,19 @@ class WindowsSystemMonitor : SystemMonitor {
                                 val name = Advapi32Util.registryGetStringValue(root, fullPath, "DisplayName")
                                 val version = try {
                                     Advapi32Util.registryGetStringValue(root, fullPath, "DisplayVersion")
-                                } catch (e: Exception) { null }
+                                } catch (_: Exception) {
+                                    null
+                                }
 
                                 if (name.isNotBlank()) {
                                     apps.add(AppInfo(name, version, 0L))
                                 }
-                            } catch (e: Exception) {
+                            } catch (_: Exception) {
                                 // Ignore keys without DisplayName
                             }
                         }
                     }
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     // Ignore access denied etc
                 }
             }
@@ -60,7 +58,7 @@ class WindowsSystemMonitor : SystemMonitor {
         val file = getPreferencesFile(browser) ?: return emptyList()
         return try {
             chromeParser.parse(file.readText(), browser).extensions
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptyList()
         }
     }
@@ -69,7 +67,7 @@ class WindowsSystemMonitor : SystemMonitor {
         val file = getPreferencesFile(browser) ?: return null
         return try {
             chromeParser.parse(file.readText(), browser).searchProvider
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }

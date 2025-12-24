@@ -4,13 +4,20 @@ import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import info.benjaminhill.desktopguardian.alert.WebHookAlertService
 import info.benjaminhill.desktopguardian.db.DatabaseDriverFactory
 import info.benjaminhill.desktopguardian.platform.SystemMonitorFactory
-// The generated interface name is `desktopguardian` (lowercase)
 import info.benjaminhill.desktopguardian.db.desktopguardian
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.Properties
 
+/**
+ * Orchestrates the scanning, diffing, and alerting process.
+ * Acts as the bridge between:
+ * - SystemMonitor (Raw OS Data)
+ * - DiffEngine (Logic)
+ * - Database (Persistence)
+ * - WebHookAlertService (Side Effects)
+ */
 class GuardianManager {
 
     private val _status = MutableStateFlow("Initializing...")
@@ -25,7 +32,7 @@ class GuardianManager {
     private val monitor = SystemMonitorFactory.getSystemMonitor()
     private val webhookService = WebHookAlertService()
 
-    // We need to initialize the DB.
+    // Database Initialization
     private val driver = DatabaseDriverFactory().createDriver()
     private val database = desktopguardian(driver)
 
@@ -41,28 +48,34 @@ class GuardianManager {
         database.mainQueries.insertConfig("alert_endpoint", url)
     }
 
-    // DiffEngine logic is pure, doesn't need DB access in constructor
+    // DiffEngine is pure logic, separated from state
     private val diffEngine = DiffEngine { System.currentTimeMillis() }
 
     suspend fun runScan() {
         _status.value = "Scanning..."
         try {
-            // 1. Get Current State
+            // 1. Get Current State (Raw OS Data)
             val currentApps = monitor.getInstalledApps()
             val currentExtensions = BrowserType.values().flatMap { browser ->
                 monitor.getBrowserExtensions(browser)
             }
+            val currentSearch = BrowserType.values().mapNotNull { browser ->
+                monitor.getDefaultSearch(browser)
+            }
 
-            // 2. Get Saved State
+            // 2. Get Saved State (Persistence)
             val savedApps = database.mainQueries.selectAllApps().executeAsList()
             val savedExtensions = database.mainQueries.selectAllExtensions().executeAsList()
+            val savedSearch = database.mainQueries.selectAllSearchConfigs().executeAsList()
 
-            // 3. Diff
+            // 3. Diff (Logic)
             val appAlerts = diffEngine.diffApps(currentApps, savedApps)
             val extAlerts = diffEngine.diffExtensions(currentExtensions, savedExtensions)
-            val alerts = appAlerts + extAlerts
+            val searchAlerts = diffEngine.diffSearch(currentSearch, savedSearch)
 
-            // 4. Alert
+            val alerts = appAlerts + extAlerts + searchAlerts
+
+            // 4. Alert (Side Effects)
             if (alerts.isNotEmpty()) {
                 _status.value = "Changes Detected! Sending ${alerts.size} alerts..."
                 alerts.forEach { alert ->
@@ -82,6 +95,11 @@ class GuardianManager {
                 database.mainQueries.deleteAllExtensions()
                 currentExtensions.forEach { ext ->
                     database.mainQueries.insertExtension(ext.browser.name, ext.id, ext.name)
+                }
+
+                database.mainQueries.deleteAllSearchConfigs()
+                currentSearch.forEach { search ->
+                    database.mainQueries.insertSearchConfig(search.browser.name, search.url)
                 }
             }
 

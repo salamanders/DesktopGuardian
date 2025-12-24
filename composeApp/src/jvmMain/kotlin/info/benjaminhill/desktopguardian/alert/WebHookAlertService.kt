@@ -9,6 +9,11 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
+/**
+ * Handles the delivery of alerts to external services.
+ * Configured to POST JSON to a Google Apps Script Web App.
+ * Manages network clients and serialization configuration.
+ */
 class WebHookAlertService {
     private val client = HttpClient(CIO) {
         install(ContentNegotiation) {

@@ -4,6 +4,11 @@ import info.benjaminhill.desktopguardian.db.InstalledApp
 import info.benjaminhill.desktopguardian.db.BrowserExtension
 import info.benjaminhill.desktopguardian.db.SearchConfig
 
+/**
+ * Pure logic class for comparing current system state against saved state.
+ * Generates alerts based on differences.
+ * Decoupled from IO and side effects.
+ */
 class DiffEngine(
     private val timeProvider: () -> Long
 ) {

@@ -12,6 +12,11 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.streams.toList
 
+/**
+ * macOS implementation of SystemMonitor.
+ * Scans /Applications folders for .app bundles.
+ * Reads Chrome Preference files for extensions and search config.
+ */
 class MacOsSystemMonitor : SystemMonitor {
 
     private val chromeParser = ChromePreferencesParser()
@@ -42,24 +47,29 @@ class MacOsSystemMonitor : SystemMonitor {
     }
 
     override suspend fun getBrowserExtensions(browser: BrowserType): List<ExtensionInfo> {
-        if (browser != BrowserType.CHROME) return emptyList()
-
-        val home = System.getProperty("user.home")
-        val prefPath = "$home/Library/Application Support/Google/Chrome/Default/Preferences"
-        val file = File(prefPath)
-
-        return if (file.exists()) {
-             try {
-                chromeParser.parse(file.readText(), browser).extensions
-            } catch (e: Exception) {
-                emptyList()
-            }
-        } else {
+        val file = getPreferencesFile(browser) ?: return emptyList()
+        return try {
+            chromeParser.parse(file.readText(), browser).extensions
+        } catch (e: Exception) {
             emptyList()
         }
     }
 
     override suspend fun getDefaultSearch(browser: BrowserType): SearchProviderInfo? {
-        return null
+        val file = getPreferencesFile(browser) ?: return null
+        return try {
+            chromeParser.parse(file.readText(), browser).searchProvider
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun getPreferencesFile(browser: BrowserType): File? {
+        if (browser != BrowserType.CHROME) return null
+
+        val home = System.getProperty("user.home")
+        val prefPath = "$home/Library/Application Support/Google/Chrome/Default/Preferences"
+        val file = File(prefPath)
+        return if (file.exists()) file else null
     }
 }

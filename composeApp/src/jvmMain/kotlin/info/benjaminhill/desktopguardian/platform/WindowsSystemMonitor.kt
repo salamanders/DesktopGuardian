@@ -10,6 +10,11 @@ import info.benjaminhill.desktopguardian.SystemMonitor
 import info.benjaminhill.desktopguardian.parsers.ChromePreferencesParser
 import java.io.File
 
+/**
+ * Windows implementation of SystemMonitor.
+ * Uses JNA to read Registry for installed apps.
+ * Reads standard Chrome/Edge Preference files for extensions and search config.
+ */
 class WindowsSystemMonitor : SystemMonitor {
 
     private val chromeParser = ChromePreferencesParser()
@@ -52,33 +57,35 @@ class WindowsSystemMonitor : SystemMonitor {
     }
 
     override suspend fun getBrowserExtensions(browser: BrowserType): List<ExtensionInfo> {
-        val localAppData = System.getenv("LOCALAPPDATA") ?: return emptyList()
-
-        val prefPath = when (browser) {
-            BrowserType.CHROME -> "$localAppData\\Google\\Chrome\\User Data\\Default\\Preferences"
-            BrowserType.EDGE -> "$localAppData\\Microsoft\\Edge\\User Data\\Default\\Preferences"
-            else -> null
-        }
-
-        return if (prefPath != null) {
-            val file = File(prefPath)
-            if (file.exists()) {
-                try {
-                    chromeParser.parse(file.readText(), browser).extensions
-                } catch (e: Exception) {
-                    emptyList()
-                }
-            } else {
-                emptyList()
-            }
-        } else {
+        val file = getPreferencesFile(browser) ?: return emptyList()
+        return try {
+            chromeParser.parse(file.readText(), browser).extensions
+        } catch (e: Exception) {
             emptyList()
         }
     }
 
     override suspend fun getDefaultSearch(browser: BrowserType): SearchProviderInfo? {
-        // Similar logic to extensions, reusing the parsed data would be efficient
-        // For MVP, just re-parsing or ignoring
-        return null
+        val file = getPreferencesFile(browser) ?: return null
+        return try {
+            chromeParser.parse(file.readText(), browser).searchProvider
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun getPreferencesFile(browser: BrowserType): File? {
+        val localAppData = System.getenv("LOCALAPPDATA") ?: return null
+        val prefPath = when (browser) {
+            BrowserType.CHROME -> "$localAppData\\Google\\Chrome\\User Data\\Default\\Preferences"
+            BrowserType.EDGE -> "$localAppData\\Microsoft\\Edge\\User Data\\Default\\Preferences"
+            else -> null
+        }
+        return if (prefPath != null) {
+            val file = File(prefPath)
+            if (file.exists()) file else null
+        } else {
+            null
+        }
     }
 }

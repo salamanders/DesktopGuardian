@@ -5,6 +5,9 @@ import androidx.compose.ui.window.application
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
+import org.jetbrains.compose.resources.painterResource
+import desktopguardian.composeapp.generated.resources.Res
+import desktopguardian.composeapp.generated.resources.desktop_guardian_icon
 
 fun main(args: Array<String>) {
     if (args.contains("--scan-only")) {
@@ -33,6 +36,7 @@ fun runGui() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "DesktopGuardian",
+        icon = painterResource(Res.drawable.desktop_guardian_icon)
     ) {
         App()
     }

@@ -70,12 +70,16 @@ compose.desktop {
             macOS {
                 bundleID = "info.benjaminhill.desktopguardian"
                 dockName = "Desktop Guardian"
+                // TODO: Uncomment and ensure .icns/.ico files exist to enable native icons.
+                // Conversion from SVG to .icns/.ico is required as jpackage does not support SVG directly.
+                // iconFile.set(project.file("src/commonMain/composeResources/drawable/desktop_guardian_icon.icns"))
             }
 
             windows {
                 menuGroup = "Desktop Guardian"
                 shortcut = true
                 upgradeUuid = "12345678-1234-1234-1234-123456789012" // Fixed UUID for upgrades
+                // iconFile.set(project.file("src/commonMain/composeResources/drawable/desktop_guardian_icon.ico"))
             }
         }
     }

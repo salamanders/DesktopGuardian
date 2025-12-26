@@ -41,6 +41,6 @@ class ChromePreferencesParserTest {
         assertEquals("ext_id_1", result.extensions[0].id)
 
         assertNotNull(result.searchProvider)
-        assertEquals("https://google.com/search?q={searchTerms}", result.searchProvider?.url)
+        assertEquals("https://google.com/search?q={searchTerms}", result.searchProvider.url)
     }
 }

@@ -13,6 +13,10 @@ completed.
 4. **Security:** Do not hardcode API keys. Use `System.getenv` or configuration files for secrets during development.
 5. **Testing:** Write unit tests for logic (parsing, diffing) and integration tests for system interactions where
    possible.
+6. **Reliability:**
+   - Logging must be persisted to `~/.desktopguardian/logs/` for remote diagnosis.
+   - Alerts must use a Store-and-Forward mechanism (DB persistence) to handle network failures.
+   - Scheduled tasks must use "StartWhenAvailable" (Windows) or similar mechanisms to ensure missed daily scans are run ASAP.
 
 ---
 
@@ -43,6 +47,7 @@ completed.
         - `BrowserExtension` (`id`, `browser`, `extensionId`, `name`)
         - `SearchConfig` (`browser`, `providerUrl`)
         - `AppConfig` (`key`, `value`) for application settings.
+        - `PendingAlert` (`id`, `message`, `details`, `timestamp`) for store-and-forward.
     3. [x] Define queries: `selectAllApps`, `insertApp`, `deleteApp`, etc.
     4. [x] *Verification:* Run `./gradlew generateSqlDelightInterface` and check generated code in `build/generated`.
 
@@ -124,7 +129,8 @@ completed.
     1. [x] Create `WebHookAlertService` (refactored from EmailAlertService).
     2. [x] Use Ktor Client to POST to a Google Apps Script Web App URL.
     3. [x] Payload: JSON with alert details.
-    4. [ ] *Verification:* Verify JSON format matches Google Apps Script expectations.
+    4. [x] *Verification:* Verify JSON format matches Google Apps Script expectations.
+    5. [x] Implement Store-and-Forward (PendingAlert table) for network reliability.
 
 2. [x] **7.2. Configuration for Alerting**
     1. [x] Move the hardcoded API endpoint to DB configuration (`AppConfig` table).
@@ -169,10 +175,12 @@ completed.
     2. [x] Windows: Generate a `.bat` or use `schtasks` to run on login.
     3. [x] macOS: Generate a `launchd` plist in `~/Library/LaunchAgents`.
     4. [x] Add a UI button "Enable Startup" that runs this logic.
+    5. [x] Updated Windows to use XML task definition for `StartWhenAvailable` support.
 
 2. [x] **9.2. Packaging**
     1. [x] Configure `jpackage` in `build.gradle.kts`.
     2. [x] *Verification:* Run `./gradlew package` (or equivalent) to generate the installer.
+    3. [x] Documented distribution process in `docs/DISTRIBUTION.md`.
 
 3. [x] **9.3. Robust Startup Path Detection**
     1. [x] Improve `StartupManager` to handle packaged app paths (using `jpackage.app-path`).

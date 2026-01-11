@@ -28,11 +28,12 @@ class GuardianManager {
     val alertEndpoint: StateFlow<String> = _alertEndpoint.asStateFlow()
 
     private val monitor = SystemMonitorFactory.getSystemMonitor()
-    private val webhookService = WebHookAlertService()
 
     // Database Initialization
     private val driver = DatabaseDriverFactory().createDriver()
     private val database = desktopguardian(driver)
+
+    private val webhookService = WebHookAlertService(database)
 
     init {
         val savedEndpoint = database.mainQueries.selectConfig("alert_endpoint").executeAsOneOrNull()
@@ -52,6 +53,9 @@ class GuardianManager {
     suspend fun runScan() {
         _status.value = "Scanning..."
         try {
+            // 0. Retry Pending Alerts
+            webhookService.flushPendingAlerts(_alertEndpoint.value)
+
             // 1. Get Current State (Raw OS Data)
             val currentApps = monitor.getInstalledApps()
             val currentExtensions = BrowserType.entries.flatMap { browser ->
@@ -77,7 +81,7 @@ class GuardianManager {
             if (alerts.isNotEmpty()) {
                 _status.value = "Changes Detected! Sending ${alerts.size} alerts..."
                 alerts.forEach { alert ->
-                    webhookService.sendAlert(alert, _alertEndpoint.value)
+                    webhookService.sendOrQueueAlert(alert, _alertEndpoint.value)
                 }
             } else {
                 _status.value = "System Healthy. No changes."

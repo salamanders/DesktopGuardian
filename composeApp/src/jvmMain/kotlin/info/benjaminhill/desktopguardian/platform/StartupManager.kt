@@ -84,13 +84,16 @@ object StartupManager {
         }
 
         try {
+            // Create XML file for advanced settings (StartWhenAvailable)
+            val xmlContent = createWindowsTaskXml(taskRunCommand)
+            val tempXml = File.createTempFile("desktopguardian_task", ".xml")
+            tempXml.writeText(xmlContent)
+
             val process = Runtime.getRuntime().exec(
                 arrayOf(
                     "schtasks", "/Create",
-                    "/SC", "DAILY",
+                    "/XML", tempXml.absolutePath,
                     "/TN", "DesktopGuardianScan",
-                    "/TR", taskRunCommand,
-                    "/ST", "10:00",
                     "/F" // Force overwrite
                 )
             )
@@ -102,10 +105,69 @@ object StartupManager {
                 val error = process.errorStream.bufferedReader().readText()
                 println("Failed to create Windows Scheduled Task. Exit code: $exitCode. Error: $error")
             }
+            tempXml.delete()
         } catch (e: Exception) {
             println("Error executing schtasks: ${e.message}")
             e.printStackTrace()
         }
+    }
+
+    private fun createWindowsTaskXml(command: String): String {
+        val escapedCommand = command
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\"", "&quot;")
+            .replace("'", "&apos;")
+
+        return """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+              <RegistrationInfo>
+                <Description>Daily scan for Desktop Guardian.</Description>
+              </RegistrationInfo>
+              <Triggers>
+                <CalendarTrigger>
+                  <StartBoundary>2024-01-01T10:00:00</StartBoundary>
+                  <Enabled>true</Enabled>
+                  <ScheduleByDay>
+                    <DaysInterval>1</DaysInterval>
+                  </ScheduleByDay>
+                </CalendarTrigger>
+              </Triggers>
+              <Principals>
+                <Principal id="Author">
+                  <LogonType>InteractiveToken</LogonType>
+                  <RunLevel>LeastPrivilege</RunLevel>
+                </Principal>
+              </Principals>
+              <Settings>
+                <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+                <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+                <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+                <AllowHardTerminate>true</AllowHardTerminate>
+                <StartWhenAvailable>true</StartWhenAvailable>
+                <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>
+                <IdleSettings>
+                  <StopOnIdleEnd>true</StopOnIdleEnd>
+                  <RestartOnIdle>false</RestartOnIdle>
+                </IdleSettings>
+                <AllowStartOnDemand>true</AllowStartOnDemand>
+                <Enabled>true</Enabled>
+                <Hidden>false</Hidden>
+                <RunOnlyIfIdle>false</RunOnlyIfIdle>
+                <WakeToRun>false</WakeToRun>
+                <ExecutionTimeLimit>PT1H</ExecutionTimeLimit>
+                <Priority>7</Priority>
+              </Settings>
+              <Actions Context="Author">
+                <Exec>
+                  <Command>cmd.exe</Command>
+                  <Arguments>/c start "" /MIN $escapedCommand</Arguments>
+                </Exec>
+              </Actions>
+            </Task>
+        """.trimIndent()
     }
 
     private fun disableWindowsStartup() {

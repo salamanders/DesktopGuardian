@@ -75,3 +75,24 @@ WHERE key = ?;
 insertConfig:
 INSERT OR REPLACE INTO AppConfig(key, value)
 VALUES (?, ?);
+
+CREATE TABLE PendingAlert (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  type TEXT NOT NULL,
+  severity TEXT NOT NULL,
+  message TEXT NOT NULL,
+  details TEXT NOT NULL,
+  timestamp INTEGER NOT NULL
+);
+
+selectAllPendingAlerts:
+SELECT *
+FROM PendingAlert;
+
+insertPendingAlert:
+INSERT INTO PendingAlert(type, severity, message, details, timestamp)
+VALUES (?, ?, ?, ?, ?);
+
+deletePendingAlert:
+DELETE FROM PendingAlert
+WHERE id = ?;

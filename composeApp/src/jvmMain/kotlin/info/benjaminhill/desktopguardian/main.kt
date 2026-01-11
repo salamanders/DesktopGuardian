@@ -8,12 +8,19 @@ import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.painterResource
 import desktopguardian.composeapp.generated.resources.Res
 import desktopguardian.composeapp.generated.resources.desktop_guardian_icon
+import info.benjaminhill.desktopguardian.platform.FileLogger
 
 fun main(args: Array<String>) {
-    if (args.contains("--scan-only")) {
-        runHeadlessScan()
-    } else {
-        runGui()
+    FileLogger.setup()
+    try {
+        if (args.contains("--scan-only")) {
+            runHeadlessScan()
+        } else {
+            runGui()
+        }
+    } catch (e: Exception) {
+        println("CRITICAL: Unhandled exception in main: ${e.message}")
+        e.printStackTrace()
     }
 }
 

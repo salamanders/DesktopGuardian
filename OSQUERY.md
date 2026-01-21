@@ -6,7 +6,7 @@ This document outlines the feasibility, overlap, and steps required to migrate *
 
 **Desktop Guardian** currently implements custom logic to parse Windows Registry, macOS paths, and Browser JSON preference files. **osquery** abstracts these exact sources into SQL tables.
 
-Migrating to osquery would significantly **reduce code volume** (removing complex parsers and file watchers) but would **increase infrastructure complexity** (requiring an osquery daemon, a configuration manager, and a log forwarder).
+Migrating to osquery would significantly **reduce code volume** (removing complex parsers and file watchers) but would **increase infrastructure complexity** (requiring an osquery daemon, a configuration manager, and a log forwarder).  The ideal solution would "spin up" a osquery process, use it to check the current values, then shut down and wait 24 hours for the next scheduled run.
 
 ## 2. Feature Overlap
 
@@ -15,21 +15,20 @@ Migrating to osquery would significantly **reduce code volume** (removing comple
 | **Installed Apps (Windows)** | Polling `HKLM\...\Uninstall` | `SELECT name, version FROM programs;` | ✅ **Strong Match** |
 | **Installed Apps (macOS)** | Scanning `/Applications` | `SELECT name, bundle_short_version FROM apps;` | ✅ **Strong Match** |
 | **Chrome Extensions** | Parsing `Preferences` JSON | `SELECT * FROM chrome_extensions;` | ✅ **Strong Match** |
-| **Firefox Addons** | Parsing `extensions.json` | `SELECT * FROM firefox_addons;` | ✅ **Strong Match** |
 | **Diffing (State Change)** | Custom `DiffEngine` | Native **Differential Queries** (logs `added`/`removed` actions). | ✅ **Strong Match** |
 | **System Info** | `java.net.InetAddress` | `SELECT hostname FROM system_info;` | ✅ **Strong Match** |
 
 ## 3. Feature Gaps
 
 ### 3.1. Browser Search Provider Monitoring (High Impact)
-*   **Desktop Guardian:** Specifically parses deep JSON keys in Chrome's `Preferences` and Firefox's compressed `mozlz4` files to find the default search engine.
-*   **osquery:** Does **not** have a native table for "Default Search Provider". It can read files, but complex JSON extraction or decompressing `mozlz4` is not natively supported in standard SQL queries without extension tables or complex `json_extract` logic that might be fragile.
+*   **Desktop Guardian:** Specifically parses deep JSON keys in Chrome's `Preferences` to find the default search engine.
+*   **osquery:** Does **not** have a native table for "Default Search Provider".
 *   **Mitigation:** You would likely need to write a custom osquery extension (in C++/Go) or keep a small script for this specific check.
 
 ### 3.2. Alerting / Webhooks
 *   **Desktop Guardian:** Has a built-in `WebHookAlertService` that POSTs JSON directly to the Google Apps Script.
 *   **osquery:** osquery is a **logger**, not an alerter. It writes results to `osqueryd.results.log` (filesystem), syslog, or AWS Kinesis.
-*   **Mitigation:** You cannot just "configure" osquery to hit a webhook. You need a **Log Forwarder** (e.g., Fluentbit, vector, or a custom Python script) to tail the log file and POST to your webhook.
+*   **Mitigation:** You cannot just "configure" osquery to hit a webhook. You need a **Log Forwarder** (e.g., Fluentbit, vector, or a custom Python script) to tail the log file and POST to your webhook.  TBD if a simple Firestore db can be used to log all changes?
 
 ### 3.3. Deployment & Self-Containment
 *   **Desktop Guardian:** A single binary/app (MSI/DMG) that contains logic, scheduling, and alerting.
@@ -90,8 +89,4 @@ If you proceed with the migration, the project structure will shift from "Applic
     *   Windows: Configure the MSI to register osqueryd as a service.
     *   macOS: Use a LaunchDaemon for osqueryd.
 
-## 5. Conclusion
-
-**Recommendation:**
-*   **Stick with the current KMP app** if you want a zero-dependency, single-file deploy that handles complex logic (like `mozlz4` parsing and "wipe-and-replace" database updates) and specific business rules (Search Providers).
 *   **Switch to osquery** if you plan to monitor *hundreds* of different metrics (network connections, USB devices, users) and want to offload the "monitoring engine" maintenance to the open-source community, accepting the complexity of managing a multi-process deployment (Daemon + Forwarder).

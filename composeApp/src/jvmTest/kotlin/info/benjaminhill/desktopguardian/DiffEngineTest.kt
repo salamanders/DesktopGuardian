@@ -8,19 +8,20 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class DiffEngineTest {
-
     private val diffEngine = DiffEngine { 1234567890L }
 
     @Test
     fun testDiffApps() {
-        val currentApps = listOf(
-            AppInfo("App1", "1.0", 0L),
-            AppInfo("App2", "2.0", 0L)
-        )
-        val savedApps = listOf(
-            InstalledApp(1, "App1", 0L, "1.0"),
-            InstalledApp(2, "App3", 0L, "1.0")
-        )
+        val currentApps =
+            listOf(
+                AppInfo("App1", "1.0", 0L),
+                AppInfo("App2", "2.0", 0L),
+            )
+        val savedApps =
+            listOf(
+                InstalledApp(1, "App1", 0L, "1.0"),
+                InstalledApp(2, "App3", 0L, "1.0"),
+            )
 
         val alerts = diffEngine.diffApps(currentApps, savedApps)
 
@@ -31,14 +32,16 @@ class DiffEngineTest {
 
     @Test
     fun testDiffExtensions() {
-        val currentExts = listOf(
-            ExtensionInfo("id1", "Ext1", BrowserType.CHROME),
-            ExtensionInfo("id2", "Ext2", BrowserType.CHROME)
-        )
-        val savedExts = listOf(
-            BrowserExtension(1, "CHROME", "id1", "Ext1"),
-            BrowserExtension(2, "CHROME", "id3", "Ext3")
-        )
+        val currentExts =
+            listOf(
+                ExtensionInfo("id1", "Ext1", BrowserType.CHROME),
+                ExtensionInfo("id2", "Ext2", BrowserType.CHROME),
+            )
+        val savedExts =
+            listOf(
+                BrowserExtension(1, "CHROME", "id1", "Ext1"),
+                BrowserExtension(2, "CHROME", "id3", "Ext3"),
+            )
 
         val alerts = diffEngine.diffExtensions(currentExts, savedExts)
 
@@ -49,12 +52,14 @@ class DiffEngineTest {
 
     @Test
     fun testDiffSearch() {
-        val currentSearch = listOf(
-            SearchProviderInfo(BrowserType.CHROME, "https://google.com")
-        )
-        val savedSearch = listOf(
-            SearchConfig("CHROME", "https://yahoo.com")
-        )
+        val currentSearch =
+            listOf(
+                SearchProviderInfo(BrowserType.CHROME, "https://google.com"),
+            )
+        val savedSearch =
+            listOf(
+                SearchConfig("CHROME", "https://yahoo.com"),
+            )
 
         val alerts = diffEngine.diffSearch(currentSearch, savedSearch)
 

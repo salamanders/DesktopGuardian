@@ -1,16 +1,17 @@
 package info.benjaminhill.desktopguardian.alert
 
 import info.benjaminhill.desktopguardian.Alert
-import info.benjaminhill.desktopguardian.AlertType
 import info.benjaminhill.desktopguardian.AlertSeverity
+import info.benjaminhill.desktopguardian.AlertType
 import info.benjaminhill.desktopguardian.db.desktopguardian
-import info.benjaminhill.desktopguardian.db.PendingAlert
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 /**
@@ -20,18 +21,24 @@ import kotlinx.serialization.json.Json
  * Implements Store-and-Forward reliability.
  */
 class WebHookAlertService(
-    private val database: desktopguardian
+    private val database: desktopguardian,
 ) {
-    private val client = HttpClient(CIO) {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                encodeDefaults = true // Ensure all fields are sent
-            })
+    private val client =
+        HttpClient(CIO) {
+            install(ContentNegotiation) {
+                json(
+                    Json {
+                        ignoreUnknownKeys = true
+                        encodeDefaults = true // Ensure all fields are sent
+                    },
+                )
+            }
         }
-    }
 
-    suspend fun sendOrQueueAlert(alert: Alert, endpoint: String) {
+    suspend fun sendOrQueueAlert(
+        alert: Alert,
+        endpoint: String,
+    ) {
         if (endpoint.isBlank() || endpoint == "https://example.com/api/alert") {
             println("Alert endpoint not configured. Skipping alert: ${alert.message}")
             return
@@ -53,13 +60,14 @@ class WebHookAlertService(
         if (pending.isNotEmpty()) {
             println("Found ${pending.size} pending alerts. Retrying...")
             pending.forEach { pendingAlert ->
-                val alert = Alert(
-                    type = AlertType.valueOf(pendingAlert.type),
-                    severity = AlertSeverity.valueOf(pendingAlert.severity),
-                    message = pendingAlert.message,
-                    details = pendingAlert.details,
-                    timestamp = pendingAlert.timestamp
-                )
+                val alert =
+                    Alert(
+                        type = AlertType.valueOf(pendingAlert.type),
+                        severity = AlertSeverity.valueOf(pendingAlert.severity),
+                        message = pendingAlert.message,
+                        details = pendingAlert.details,
+                        timestamp = pendingAlert.timestamp,
+                    )
                 try {
                     sendNetworkRequest(alert, endpoint)
                     database.mainQueries.deletePendingAlert(pendingAlert.id)
@@ -73,7 +81,10 @@ class WebHookAlertService(
         }
     }
 
-    private suspend fun sendNetworkRequest(alert: Alert, endpoint: String) {
+    private suspend fun sendNetworkRequest(
+        alert: Alert,
+        endpoint: String,
+    ) {
         client.post(endpoint) {
             contentType(ContentType.Application.Json)
             setBody(alert)
@@ -87,7 +98,7 @@ class WebHookAlertService(
                 alert.severity.name,
                 alert.message,
                 alert.details,
-                alert.timestamp
+                alert.timestamp,
             )
             println("Alert queued in database.")
         } catch (e: Exception) {

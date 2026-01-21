@@ -39,7 +39,6 @@ object FileLogger {
             println("----------------------------------------------------------------")
             println("Log initialized at ${java.time.LocalDateTime.now()}")
             println("Log file: ${logFile.absolutePath}")
-
         } catch (e: Exception) {
             // Fallback to original stderr if logging fails
             System.err.println("Failed to initialize FileLogger: ${e.message}")
@@ -50,15 +49,18 @@ object FileLogger {
 
 private class MultiOutputStream(
     private val original: OutputStream,
-    private val fileOut: OutputStream
+    private val fileOut: OutputStream,
 ) : OutputStream() {
-
     override fun write(b: Int) {
         original.write(b)
         fileOut.write(b)
     }
 
-    override fun write(b: ByteArray, off: Int, len: Int) {
+    override fun write(
+        b: ByteArray,
+        off: Int,
+        len: Int,
+    ) {
         original.write(b, off, len)
         fileOut.write(b, off, len)
     }

@@ -1,0 +1,9 @@
+**/build/**
+build/**
+composeApp/build/**
+**/generated/**
+**/*generated*/**
+generated/**
+**/*generated*
+**/*.sq.kt
+**/resources/**

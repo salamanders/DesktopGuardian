@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.asStateFlow
  * - WebHookAlertService (Side Effects)
  */
 class GuardianManager {
-
     private val _status = MutableStateFlow("Initializing...")
     val status: StateFlow<String> = _status.asStateFlow()
 
@@ -58,12 +57,14 @@ class GuardianManager {
 
             // 1. Get Current State (Raw OS Data)
             val currentApps = monitor.getInstalledApps()
-            val currentExtensions = BrowserType.entries.flatMap { browser ->
-                monitor.getBrowserExtensions(browser)
-            }
-            val currentSearch = BrowserType.entries.mapNotNull { browser ->
-                monitor.getDefaultSearch(browser)
-            }
+            val currentExtensions =
+                BrowserType.entries.flatMap { browser ->
+                    monitor.getBrowserExtensions(browser)
+                }
+            val currentSearch =
+                BrowserType.entries.mapNotNull { browser ->
+                    monitor.getDefaultSearch(browser)
+                }
 
             // 2. Get Saved State (Persistence)
             val savedApps = database.mainQueries.selectAllApps().executeAsList()
@@ -106,7 +107,6 @@ class GuardianManager {
             }
 
             _lastScan.value = java.time.LocalDateTime.now().toString()
-
         } catch (e: Exception) {
             _status.value = "Error: ${e.message}"
             e.printStackTrace()

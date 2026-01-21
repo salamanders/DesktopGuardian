@@ -6,12 +6,12 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class ChromePreferencesParserTest {
-
     private val parser = ChromePreferencesParser()
 
     @Test
     fun testParse() {
-        val json = """
+        val json =
+            """
             {
               "extensions": {
                 "settings": {
@@ -32,7 +32,7 @@ class ChromePreferencesParserTest {
                 }
               }
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val result = parser.parse(json, BrowserType.CHROME)
 

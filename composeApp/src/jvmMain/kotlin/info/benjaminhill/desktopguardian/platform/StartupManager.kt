@@ -73,15 +73,16 @@ object StartupManager {
         // schtasks /TR expects the command to be wrapped.
         // If the path has spaces, it needs inner quotes.
 
-        val taskRunCommand = if (commandParts.size == 1) {
-            // jpackage: "C:\Path\To\Exe" --scan-only
-            "\"${commandParts[0]}\" --scan-only"
-        } else {
-            // java -jar: java -jar "C:\Path\To\Jar" --scan-only
-            // Note: using javaw for java -jar might hide console, but --scan-only is headless anyway.
-            // We use commandParts[0] (java/javaw), commandParts[1] (-jar), commandParts[2] (path)
-            "${commandParts[0]} ${commandParts[1]} \"${commandParts[2]}\" --scan-only"
-        }
+        val taskRunCommand =
+            if (commandParts.size == 1) {
+                // jpackage: "C:\Path\To\Exe" --scan-only
+                "\"${commandParts[0]}\" --scan-only"
+            } else {
+                // java -jar: java -jar "C:\Path\To\Jar" --scan-only
+                // Note: using javaw for java -jar might hide console, but --scan-only is headless anyway.
+                // We use commandParts[0] (java/javaw), commandParts[1] (-jar), commandParts[2] (path)
+                "${commandParts[0]} ${commandParts[1]} \"${commandParts[2]}\" --scan-only"
+            }
 
         try {
             // Create XML file for advanced settings (StartWhenAvailable)
@@ -89,14 +90,19 @@ object StartupManager {
             val tempXml = File.createTempFile("desktopguardian_task", ".xml")
             tempXml.writeText(xmlContent)
 
-            val process = Runtime.getRuntime().exec(
-                arrayOf(
-                    "schtasks", "/Create",
-                    "/XML", tempXml.absolutePath,
-                    "/TN", "DesktopGuardianScan",
-                    "/F" // Force overwrite
+            val process =
+                Runtime.getRuntime().exec(
+                    arrayOf(
+                        "schtasks",
+                        "/Create",
+                        "/XML",
+                        tempXml.absolutePath,
+                        "/TN",
+                        "DesktopGuardianScan",
+                        "/F",
+                        // Force overwrite
+                    ),
                 )
-            )
 
             val exitCode = process.waitFor()
             if (exitCode == 0) {
@@ -113,12 +119,13 @@ object StartupManager {
     }
 
     private fun createWindowsTaskXml(command: String): String {
-        val escapedCommand = command
-            .replace("&", "&amp;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;")
-            .replace("\"", "&quot;")
-            .replace("'", "&apos;")
+        val escapedCommand =
+            command
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&apos;")
 
         return """
             <?xml version="1.0" encoding="UTF-8"?>
@@ -167,18 +174,21 @@ object StartupManager {
                 </Exec>
               </Actions>
             </Task>
-        """.trimIndent()
+            """.trimIndent()
     }
 
     private fun disableWindowsStartup() {
         try {
-            val process = Runtime.getRuntime().exec(
-                arrayOf(
-                    "schtasks", "/Delete",
-                    "/TN", "DesktopGuardianScan",
-                    "/F"
+            val process =
+                Runtime.getRuntime().exec(
+                    arrayOf(
+                        "schtasks",
+                        "/Delete",
+                        "/TN",
+                        "DesktopGuardianScan",
+                        "/F",
+                    ),
                 )
-            )
             process.waitFor()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -206,7 +216,8 @@ object StartupManager {
         val allArgs = commandParts + "--scan-only"
         val argsXml = allArgs.joinToString("\n") { "<string>$it</string>" }
 
-        val plistContent = """
+        val plistContent =
+            """
             <?xml version="1.0" encoding="UTF-8"?>
             <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
             <plist version="1.0">
@@ -230,7 +241,7 @@ object StartupManager {
                 <string>/tmp/desktopguardian.error.log</string>
             </dict>
             </plist>
-        """.trimIndent()
+            """.trimIndent()
 
         plistFile.writeText(plistContent)
         println("macOS LaunchAgent created at ${plistFile.absolutePath}")

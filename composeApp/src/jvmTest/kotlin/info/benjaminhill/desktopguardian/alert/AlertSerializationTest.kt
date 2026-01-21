@@ -12,21 +12,22 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class AlertSerializationTest {
-
-    private val json = Json {
-        ignoreUnknownKeys = true
-        encodeDefaults = true
-    }
+    private val json =
+        Json {
+            ignoreUnknownKeys = true
+            encodeDefaults = true
+        }
 
     @Test
     fun testAlertSerialization() {
-        val alert = Alert(
-            type = AlertType.APP_ADDED,
-            severity = AlertSeverity.INFO,
-            message = "New App: Discord",
-            details = "Version 1.0.0",
-            timestamp = 1715623423423
-        )
+        val alert =
+            Alert(
+                type = AlertType.APP_ADDED,
+                severity = AlertSeverity.INFO,
+                message = "New App: Discord",
+                details = "Version 1.0.0",
+                timestamp = 1715623423423,
+            )
 
         val jsonString = json.encodeToString(alert)
         val jsonObject = json.parseToJsonElement(jsonString) as JsonObject

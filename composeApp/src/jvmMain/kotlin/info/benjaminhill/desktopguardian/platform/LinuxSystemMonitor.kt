@@ -1,6 +1,10 @@
 package info.benjaminhill.desktopguardian.platform
 
-import info.benjaminhill.desktopguardian.*
+import info.benjaminhill.desktopguardian.AppInfo
+import info.benjaminhill.desktopguardian.BrowserType
+import info.benjaminhill.desktopguardian.ExtensionInfo
+import info.benjaminhill.desktopguardian.SearchProviderInfo
+import info.benjaminhill.desktopguardian.SystemMonitor
 import info.benjaminhill.desktopguardian.parsers.ChromePreferencesParser
 import java.io.File
 
@@ -50,10 +54,11 @@ class LinuxSystemMonitor : SystemMonitor {
     private fun getChromePreferencesFile(): File? {
         val userHome = System.getProperty("user.home")
         // Standard Chrome config path on Linux
-        val possiblePaths = listOf(
-            "$userHome/.config/google-chrome/Default/Preferences",
-            "$userHome/.config/chromium/Default/Preferences"
-        )
+        val possiblePaths =
+            listOf(
+                "$userHome/.config/google-chrome/Default/Preferences",
+                "$userHome/.config/chromium/Default/Preferences",
+            )
 
         return possiblePaths.map { File(it) }
             .firstOrNull { it.exists() && it.canRead() }

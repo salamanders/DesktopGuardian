@@ -1,6 +1,10 @@
 package info.benjaminhill.desktopguardian.platform
 
-import info.benjaminhill.desktopguardian.*
+import info.benjaminhill.desktopguardian.AppInfo
+import info.benjaminhill.desktopguardian.BrowserType
+import info.benjaminhill.desktopguardian.ExtensionInfo
+import info.benjaminhill.desktopguardian.SearchProviderInfo
+import info.benjaminhill.desktopguardian.SystemMonitor
 import info.benjaminhill.desktopguardian.parsers.ChromePreferencesParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -14,15 +18,15 @@ import java.nio.file.Paths
  * Reads Chrome Preference files for extensions and search config.
  */
 class MacOsSystemMonitor : SystemMonitor {
-
     private val chromeParser = ChromePreferencesParser()
 
     override suspend fun getInstalledApps(): List<AppInfo> {
         val apps = mutableListOf<AppInfo>()
-        val searchPaths = listOf(
-            Paths.get("/Applications"),
-            Paths.get(System.getProperty("user.home"), "Applications")
-        )
+        val searchPaths =
+            listOf(
+                Paths.get("/Applications"),
+                Paths.get(System.getProperty("user.home"), "Applications"),
+            )
 
         for (path in searchPaths) {
             if (Files.exists(path)) {

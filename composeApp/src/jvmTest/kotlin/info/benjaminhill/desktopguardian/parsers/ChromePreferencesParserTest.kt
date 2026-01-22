@@ -36,9 +36,8 @@ class ChromePreferencesParserTest {
 
         val result = parser.parse(json, BrowserType.CHROME)
 
-        assertEquals(1, result.extensions.size)
-        assertEquals("Extension One", result.extensions[0].name)
-        assertEquals("ext_id_1", result.extensions[0].id)
+        // Extensions parsing is removed from ChromePreferencesParser, so we don't check for them here.
+        // We only verify that search provider parsing still works.
 
         assertNotNull(result.searchProvider)
         assertEquals("https://google.com/search?q={searchTerms}", result.searchProvider.url)

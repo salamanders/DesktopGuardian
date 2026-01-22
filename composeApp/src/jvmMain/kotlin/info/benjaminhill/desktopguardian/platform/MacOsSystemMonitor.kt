@@ -2,71 +2,37 @@ package info.benjaminhill.desktopguardian.platform
 
 import info.benjaminhill.desktopguardian.AppInfo
 import info.benjaminhill.desktopguardian.BrowserType
-import info.benjaminhill.desktopguardian.ExtensionInfo
-import info.benjaminhill.desktopguardian.SearchProviderInfo
-import info.benjaminhill.desktopguardian.SystemMonitor
-import info.benjaminhill.desktopguardian.parsers.ChromePreferencesParser
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.jsonArray
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.Paths
 
-/**
- * macOS implementation of SystemMonitor.
- * Scans /Applications folders for .app bundles.
- * Reads Chrome Preference files for extensions and search config.
- */
-class MacOsSystemMonitor : SystemMonitor {
-    private val chromeParser = ChromePreferencesParser()
+class MacOsSystemMonitor : OsQuerySystemMonitor() {
 
     override suspend fun getInstalledApps(): List<AppInfo> {
-        val apps = mutableListOf<AppInfo>()
-        val searchPaths =
-            listOf(
-                Paths.get("/Applications"),
-                Paths.get(System.getProperty("user.home"), "Applications"),
-            )
-
-        for (path in searchPaths) {
-            if (Files.exists(path)) {
-                try {
-                    withContext(Dispatchers.IO) {
-                        Files.walk(path, 2)
-                    }.use { stream ->
-                        stream.filter { it.toString().endsWith(".app") }
-                            .forEach { appPath ->
-                                val name = appPath.fileName.toString().removeSuffix(".app")
-                                apps.add(AppInfo(name, null, 0L))
-                            }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
+        if (!osQueryClient.isAvailable()) {
+            println("osqueryi not found. Cannot fetch installed apps.")
+            return emptyList()
         }
-        return apps
-    }
 
-    override suspend fun getBrowserExtensions(browser: BrowserType): List<ExtensionInfo> {
-        val file = getPreferencesFile(browser) ?: return emptyList()
         return try {
-            chromeParser.parse(file.readText(), browser).extensions
-        } catch (_: Exception) {
+            val jsonOutput = osQueryClient.execute("SELECT name, bundle_short_version FROM apps;")
+            val rawList = json.parseToJsonElement(jsonOutput).jsonArray
+
+            rawList.map { element ->
+                val item = json.decodeFromJsonElement<OsQueryApp>(element)
+                AppInfo(
+                    name = item.name,
+                    version = item.bundle_short_version,
+                    installDate = 0L
+                )
+            }
+        } catch (e: Exception) {
+            println("Error fetching apps from osquery: $e")
             emptyList()
         }
     }
 
-    override suspend fun getDefaultSearch(browser: BrowserType): SearchProviderInfo? {
-        val file = getPreferencesFile(browser) ?: return null
-        return try {
-            chromeParser.parse(file.readText(), browser).searchProvider
-        } catch (_: Exception) {
-            null
-        }
-    }
-
-    private fun getPreferencesFile(browser: BrowserType): File? {
+    override fun getPreferencesFile(browser: BrowserType): File? {
         if (browser != BrowserType.CHROME) return null
 
         val home = System.getProperty("user.home")
